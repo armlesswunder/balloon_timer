@@ -40,12 +40,15 @@ import static com.smartvue.acballoontimer.MyBroadcastReceiver.convertDate;
 import static java.text.DateFormat.getDateTimeInstance;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String catalogURL = "https://play.google.com/store/apps/details?id=com.abw4v.accatalog";
+    public static final String donateURL = "https://gofund.me/e6fc7138";
 
     public static final String CHANNEL_ID ="AC_Balloon_Timer";
     static final int WILD_WORLD = 0;
     static final int CITY_FOLK = 1;
     static final int NEW_LEAF = 2;
     static final int NEW_HORIZONS = 3;
+    static final boolean debug = false;
 
     int selectedGame = NEW_HORIZONS;
 
@@ -115,6 +118,18 @@ public class MainActivity extends AppCompatActivity {
         actionStop = new NotificationCompat.Action(null, "stop", stopPendingIntent);
     }
 
+    public void stop(View view) {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        MainActivity.alarmManager.cancel(pendingIntent);
+        notificationManager.cancelAll();
+        try {
+            MainActivity.wl_cpu.release();
+            MainActivity.wl.release();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onDestroy() {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
@@ -132,8 +147,9 @@ public class MainActivity extends AppCompatActivity {
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         String debugMsg = "At: " + convertDate(System.currentTimeMillis(), "hh:mm:ss") + " Should've been: " + convertDate(getStartAtOffset(), "hh:mm:ss");
+        String regularMsg = "Next Present: " + convertDate(getStartAtOffset(), "hh:mm:ss");
         MainActivity.alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(getStartAtOffset(), pendingIntent), pendingIntent);
-        Toast.makeText(this, debugMsg, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, debug ? debugMsg : regularMsg, Toast.LENGTH_LONG).show();
         keepAwake(this);
         playAlertSound(this);
     }
@@ -434,5 +450,17 @@ public class MainActivity extends AppCompatActivity {
         else {
             return Integer.toString(seconds);
         }
+    }
+
+    public void donatePressed(View view) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(donateURL));
+        startActivity(intent);
+    }
+
+    public void catalogPressed(View view) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(catalogURL));
+        startActivity(intent);
     }
 }

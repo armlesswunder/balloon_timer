@@ -33,6 +33,7 @@
             android:src="@drawable/ic_settings"
             android:tint="@color/textColorActionBar"
             android:layout_margin="8dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
@@ -111,6 +112,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/lblHours"
         android:text="Start Timer"/>
+
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:backgroundTint="@color/colorAccent"
+        android:text="Stop Timer"
+        android:onClick="stop"
+        android:textColor="@color/textColorActionBar"
+        app:layout_constraintStart_toEndOf="@+id/btnStart"
+        app:layout_constraintTop_toBottomOf="@id/lblHours" />
 
     <TextView
         android:id="@+id/lblOffset"
@@ -196,5 +209,29 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnCustomTime" />
+
+    <Button
+        android:id="@+id/btnDonate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/colorAccent"
+        android:text="Donate"
+        android:onClick="donatePressed"
+        android:textColor="@color/textColorActionBar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btnCatalog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:text="Catalog"
+        android:onClick="catalogPressed"
+        android:textColor="@color/textColorActionBar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnDonate" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

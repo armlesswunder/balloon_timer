@@ -18,6 +18,7 @@ import static com.smartvue.acballoontimer.MainActivity.CHANNEL_ID;
 import static com.smartvue.acballoontimer.MainActivity.actionStop;
 import static com.smartvue.acballoontimer.MainActivity.earlyMinutes;
 import static com.smartvue.acballoontimer.MainActivity.earlySeconds;
+import static com.smartvue.acballoontimer.MainActivity.getStartAtOffset;
 import static com.smartvue.acballoontimer.MainActivity.pendingIntent;
 import static com.smartvue.acballoontimer.MainActivity.startAt;
 import static com.smartvue.acballoontimer.MainActivity.time;
@@ -32,8 +33,12 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
             MainActivity.alarmManager.cancel(pendingIntent);
             notificationManager.cancelAll();
-            MainActivity.wl_cpu.release();
-            MainActivity.wl.release();
+            try {
+                MainActivity.wl_cpu.release();
+                MainActivity.wl.release();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
         } else {
             showNotification(context);
             appNotification(context);
@@ -43,8 +48,9 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
     }
 
     void appNotification(Context context) {
-        String msg = "At: " + convertDate(System.currentTimeMillis(), "hh:mm:ss") + " Should've been: " + convertDate(MainActivity.getStartAtOffset(), "hh:mm:ss");
-        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+        String debugMsg = "At: " + convertDate(System.currentTimeMillis(), "hh:mm:ss") + " Should've been: " + convertDate(getStartAtOffset(), "hh:mm:ss");
+        String regularMsg = "Next Present: " + convertDate(getStartAtOffset(), "hh:mm:ss");
+        Toast.makeText(context, MainActivity.debug ? debugMsg : regularMsg, Toast.LENGTH_LONG).show();
         MainActivity.playAlertSound(context);
     }
 
@@ -55,14 +61,15 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
     }
 
     NotificationCompat.Builder getNotification(Context context) {
-        String msg = "At: " + convertDate(System.currentTimeMillis(), "hh:mm:ss") + " Should've been: " + convertDate(MainActivity.getStartAtOffset(), "hh:mm:ss");
+        String debugMsg = "At: " + convertDate(System.currentTimeMillis(), "hh:mm:ss") + " Should've been: " + convertDate(getStartAtOffset(), "hh:mm:ss");
+        String regularMsg = "Next Present: " + convertDate(getStartAtOffset(), "hh:mm:ss");
 
         return new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle("Times up")
-                .setContentText(msg)
+                .setContentText(MainActivity.debug ? debugMsg : regularMsg)
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(msg))
+                        .bigText(MainActivity.debug ? debugMsg : regularMsg))
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .addAction(actionStop)
@@ -76,7 +83,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
         MainActivity.alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         startAt += 60000L * time;
         if (startAt > System.currentTimeMillis()) {
-            MainActivity.alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(MainActivity.getStartAtOffset(), pendingIntent), pendingIntent);
+            MainActivity.alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(getStartAtOffset(), pendingIntent), pendingIntent);
         } else {
             Log.d("StartAlert", ": system time: "+System.currentTimeMillis()+" lower than start time: "+startAt);
         }
